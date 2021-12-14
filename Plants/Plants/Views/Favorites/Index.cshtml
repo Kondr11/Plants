@@ -1,0 +1,59 @@
+﻿@model Plants.Models.FavoritesIndexViewModel
+
+@{
+    ViewBag.Title = "Plants market: избранное";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Избранное</h2>
+
+@{ var favoritesItem = new Plants.Models.ApplicationDbContext().FavoritesItems.ToList();}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Картинка</th>
+            <th>Категория</th>
+            <th class="text-right">Цена</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in favoritesItem)
+        {
+            if (item.FavoritesId == Model.Id)
+            {
+                <tr id="@string.Format("{0}Favorites", item.Id)">
+                    @Html.Action("ViewFavoritesItem", "Favorites", new { favoritesId = item.Id })
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div class="text-center">
+    <a class="btn btn-primary" href="@Model.ReturnUrl">Продолжить покупки</a>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+<script>
+    $(document).on('click', '.link', function () {
+        var quantityId = this.id;
+        var id = quantityId.slice(0, -1);
+        var favoritesId = id + 'Favorites';
+            success: $(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/Favorites/ViewFavoritesItem",
+                    data: "favoritesId=" + id,
+                    success: function (result) {
+                        $("#" + favoritesId).html(result);
+                    }
+                });
+            });
+        });
+</script>

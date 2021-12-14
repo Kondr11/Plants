@@ -1,0 +1,11 @@
+﻿@model Plants.Models.CartItem
+
+<div class="navbar-right">
+    @Html.ActionLink("В корзину", "Index", "Cart", new { returnUrl = Request.Url.PathAndQuery }, new { @class = "btn btn-default navbar-btn" })
+    @Html.ActionLink("В избранное", "Index", "Favorites", new { returnUrl = Request.Url.PathAndQuery }, new { @class = "btn btn-default navbar-btn" })
+</div>
+
+<div id ="change"class="navbar-text navbar-right">
+    <b>Ваша корзина: </b>
+    количество товаров: <b id="count">@ViewBag.Count</b>, стоимостью: <b id="totalQost">@ViewBag.TotalQost</b>  
+</div>

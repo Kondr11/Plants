@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Plants.Models.Purchases>
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<h4>Purchases</h4>
+<hr />
+@{var db = new Plants.Models.ApplicationDbContext();}
+<table class="table">
+    <tr>
+        <th>@Html.DisplayName("Категория")</th>
+        <th>@Html.DisplayName("Товар")</th>
+        <th>@Html.DisplayName("Изображение")</th>
+        <th>@Html.DisplayName("Количество")</th>
+        <th>@Html.DisplayName("Стоимость за единицу товара")</th>
+        <th>@Html.DisplayName("Общая стоимость")</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        foreach (var product in item.Products)
+        {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => product.Category.CategoryName)</td>
+            <td>@Html.DisplayFor(modelItem => product.Name)</td>
+            <td>
+                @Html.Raw("<img style='width:128px; height:128px;' src=\"data:image/jpeg;base64,"
++ Convert.ToBase64String(product.Image) + "\" />")
+            </td>
+            @{ var quantityProducts = db.QuantityProducts.Where(q => q.PurchaseId == item.Id).ToList();
+                var quantity = quantityProducts.First(p => p.ProductId == product.Id).Quantity;
+                var total = quantity * product.Qost;}
+            <td>@Html.DisplayFor(modelItem => quantity)</td>
+            <td>@Html.DisplayFor(modelItem => product.Qost) руб</td>
+            <td>@Html.DisplayFor(modelItem => total) руб</td>
+        </tr>
+        }
+    }
+</table>
+<tfoot>
+    <tr>
+        <td colspan="3" class="text-right">Всего товаров:</td>
+        <td class="text-right">@Html.DisplayFor(model => Model.First().Amount)</td>
+        <td colspan="3" class="text-right">На сумму:</td>
+        <td class="text-right">@string.Format("{0} руб", Model.First().Qost)</td>
+        <td colspan="3" class="text-right">Дата покупки:</td>
+        <td class="text-right">@Html.DisplayFor(model => Model.First().DateTime)</td>
+    </tr>
+</tfoot>
+<p>
+    @Html.ActionLink("Обратно к истории покупок", "Index", new { userId = ViewBag.UserId })
+</p>

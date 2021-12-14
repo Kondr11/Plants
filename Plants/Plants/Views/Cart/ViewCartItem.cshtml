@@ -1,0 +1,48 @@
+﻿@model Plants.Models.CartItem
+
+<td class="text-left"> @Html.DisplayFor(modelItem => Model.Product.Name)</td>
+<td class="text-center">@Html.DisplayFor(modelItem => Model.Quantity)</td>
+<td class="text-left"> @Html.DisplayFor(modelItem => Model.Product.Description)</td>
+<td class="text-center">
+    @if (Model != null)
+    {
+        @Html.Raw("<img style='width:128px; height:128px;' src=\"data:image/jpeg;base64,"
+   + Convert.ToBase64String(Model.Product.Image) + "\" />");
+    }
+</td>
+<td class="text-left">@Html.DisplayFor(modelItem => Model.Product.Category.CategoryName)</td>
+@if (Model != null)
+{
+    <td class="text-right">@Html.DisplayFor(modelItem => Model.Product.Qost) руб</td>
+}
+else
+{
+    <td class="text-right">@Html.DisplayFor(modelItem => Model.Product.Qost)</td>
+}
+<td class="text-right">
+    @{ decimal res = 0;
+        if (Model != null)
+        {
+            res = Model.Product.Qost * Model.Quantity;
+            var total = string.Format("{0} руб", res);
+            @Html.DisplayFor(modelItem => total);
+        }
+    }
+</td>
+<td>
+    @if (Model != null)
+    {
+        @Ajax.ActionLink("Удалить из корзины", "EmptyResultRemoveItem", "Cart",
+           new { removeCartID = Model.CartId, removeProductID = Model.ProductId, quantity = "xxx" },
+           new AjaxOptions { UpdateTargetId = "quantity" }, new { @class = "link", @id = Model.Id + "q" })
+        var negId = @Model.Id + "Neg";
+        var moreId = @Model.Id + "More";
+        var notNumId = @Model.Id + "NotNum";
+        <p class="my-valid" id="@negId">Число должно быть больше 0</p>
+        <p class="my-valid" id="@moreId">Число не должно привышать количество продукции в корзине: @Model.Quantity</p>
+        <p class="my-valid" id="@notNumId">Введенное значение должно быть числом</p>
+        <p>
+            Количество:<input type="number" name="quantity" id="@Model.Id" class="quantity" value="" min="0" max="@Model.Quantity" />
+        </p>
+    }
+</td>

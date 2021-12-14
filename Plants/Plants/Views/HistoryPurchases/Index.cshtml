@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Plants.Models.Purchases>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Amount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Qost)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateTime)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    if (item.Show != false)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Amount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Qost)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateTime)
+        </td>
+        <td>
+            @Html.ActionLink("Подробнее", "Details", new { userId = item.Users.First().Id, purchaseId = item.Id }) |
+            @Html.ActionLink("Удалить", "Delete", new { userId = item.Users.First().Id, id = item.Id })
+        </td>
+    </tr>
+    }
+}
+
+</table>

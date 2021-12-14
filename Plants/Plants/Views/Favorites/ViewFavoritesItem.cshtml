@@ -1,0 +1,28 @@
+﻿@model Plants.Models.FavoritesItem
+
+<td class="text-left"> @Html.DisplayFor(modelItem => Model.Product.Name)</td>
+<td class="text-left"> @Html.DisplayFor(modelItem => Model.Product.Description)</td>
+<td class="text-center">
+    @if (Model != null)
+    {
+        @Html.Raw("<img style='width:128px; height:128px;' src=\"data:image/jpeg;base64,"
+        + Convert.ToBase64String(Model.Product.Image) + "\" />");
+    }
+</td>
+<td class="text-left">@Html.DisplayFor(modelItem => Model.Product.Category.CategoryName)</td>
+@if (Model != null)
+{
+    <td class="text-right">@Html.DisplayFor(modelItem => Model.Product.Qost) руб</td>
+}
+else
+{
+    <td class="text-right">@Html.DisplayFor(modelItem => Model.Product.Qost)</td>
+}
+<td>
+    @if (Model != null)
+    {
+        @Ajax.ActionLink("Удалить из избранного", "EmptyResultRemoveItem", "Favorites",
+            new { removeFavoritesID = Model.FavoritesId, removeProductID = Model.ProductId },
+            new AjaxOptions { UpdateTargetId = "quantity" }, new { @class = "link", @id = Model.Id + "q" })
+    }
+</td>

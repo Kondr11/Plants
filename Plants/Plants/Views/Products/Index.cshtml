@@ -1,0 +1,111 @@
+﻿@model IEnumerable<Plants.Models.Products>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .my-valid {
+        display: none;
+    }
+</style>
+<h2>Index</h2>
+<table class="table">
+    <tr>
+        @foreach (var item in Model)
+        {
+        <td>
+            <p>
+                @Html.Raw("<img style='width:128px; height:128px;' src=\"data:image/jpeg;base64,"
++ Convert.ToBase64String(item.Image) + "\" />")
+            </p>
+            <p>@Html.DisplayFor(modelItem => item.Name)</p>
+            <p>@Html.DisplayFor(modelItem => item.Qost)</p>
+            <p>@Html.DisplayFor(modelItem => item.Description)</p>
+            <p>@Html.DisplayFor(modelItem => item.Category.CategoryName)</p>
+            @{
+                var negId = item.Id + "Neg";
+                var moreId = @item.Id + "More";
+                var notNumId = @item.Id + "NotNum";
+            }
+            <p class="my-valid" id="@negId">Число должно быть больше 0</p>
+            <p class="my-valid" id="@moreId">Число не должно привышать количество продукции на скледе: @item.QuantityInStock</p>
+            <p class="my-valid" id="@notNumId">Введенное значение должно быть числом</p>
+            <p>
+                Количество:<input type="number" name="quantity" id="@item.Id" class="quantity" value="" min="0" max="@item.QuantityInStock" />
+            </p>
+            <p>
+                @Ajax.ActionLink("Добавить в корзину", "EmptyResultAddToCart", "Cart", new { id = item.Id, quantity = "xxx" }, new AjaxOptions { UpdateTargetId = "quantity" }, new { @class = "link", @id = item.Id + "w" })
+            </p>
+            <p>
+                @Ajax.ActionLink("Добавить в избранное", "EmptyResultAddToFavorites", "Favorites", new { id = item.Id }, new AjaxOptions { UpdateTargetId = "quantity" })
+            </p>
+        </td>
+        }
+    </tr>
+
+</table>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+<script>
+    $(document).on('change', '.quantity', function () {
+        var id = this.id;
+        var linkId = id + 'w';
+        var flag = '0';
+        var reg = /^\-*\d+/;
+        document.getElementById(linkId).style.display = 'block';
+        document.getElementById(id + 'Neg').style.display = 'none';
+        document.getElementById(id + 'More').style.display = 'none';
+        document.getElementById(id + 'NotNum').style.display = 'none';
+        var quantityValue = document.getElementById(id).value;
+        var index = document.getElementById(linkId).href.lastIndexOf('=');
+        var href = document.getElementById(linkId).href.slice(0, index) + '=' + quantityValue;
+        var max = Number(document.getElementById(id).getAttribute("max"));
+        if (!reg.test(quantityValue)) {
+            flag = 'notNum';
+        } else if (quantityValue < '0') {
+            flag = 'neg';
+        } else if (Number(quantityValue) > max) {
+            flag = 'more';
+        }
+        switch (flag) {
+            case 'neg':
+                document.getElementById(id + 'Neg').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+            case 'more':
+                document.getElementById(id + 'More').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+            case 'notNum':
+                document.getElementById(id + 'NotNum').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+        }
+        var links = document.links;
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].id == linkId) {
+                $(document.links[i]).attr("href", href);
+            }
+        }
+    })
+    $(document).on('click', '.link', function () {
+        var linkId = this.id;
+        var id = linkId.slice(0, -1);
+        document.getElementById(id).value = null;
+        success: $(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Cart/Sum",
+                dataType: 'html',
+                success: function (result) {
+                    $("#sum").html(result);
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,132 @@
+﻿@model Plants.Models.CartIndexViewModel
+
+@{
+    ViewBag.Title = "Plants market: ваша корзина";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .my-valid {
+        display: none;
+    }
+</style>
+<h2>Ваша корзина</h2>
+
+@{ var cartItem = new Plants.Models.ApplicationDbContext().ShoppingCartItems.ToList();}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Количество</th>
+            <th>Описание</th>
+            <th>Картинка</th>
+            <th>Категория</th>
+            <th class="text-right">Цена</th>
+            <th class="text-right">Общая цена</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in cartItem)
+        {
+            if (item.CartId == Model.Id)
+            {
+                <tr id="@string.Format("{0}Cart", item.Id)">
+                    @Html.Action("ViewCartItem", "Cart", new { cartId = item.Id })
+                </tr>
+            }
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="text-right">Итого:</td>
+            <td class="text-right" id="getTotal">
+                @string.Format("{0} руб", Html.Action("GetTotal"))
+                @Html.ActionLink("Оформить покупку", "ToCheckout", new { id = Model.Id })
+            </td>
+        </tr>
+    </tfoot>
+</table>
+@{string returnUrl = string.Empty;}
+<div class="text-center">
+    <a class="btn btn-primary" href="@{returnUrl = Model.ReturnUrl == "/Cart/Sum" ? "/Products" : Model.ReturnUrl; } ">Продолжить покупки</a>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+
+<script>
+    $(document).on('change', '.quantity', function () {
+        var id = this.id;
+        var linkId = id + 'q';
+        var quantityValue = document.getElementById(id).value;
+        var flag = '0';
+        var reg = /^\-*\d+/;
+        document.getElementById(linkId).style.display = 'block';
+        document.getElementById(id + 'Neg').style.display = 'none';
+        document.getElementById(id + 'More').style.display = 'none';
+        document.getElementById(id + 'NotNum').style.display = 'none';
+        var index = document.getElementById(linkId).href.lastIndexOf('=');
+        var href = document.getElementById(linkId).href.slice(0, index) + '=' + quantityValue;
+        var max = Number(document.getElementById(id).getAttribute("max"));
+        if (!reg.test(quantityValue)) {
+            flag = 'notNum';
+        } else if (quantityValue < '0') {
+            flag = 'neg';
+        } else if (Number(quantityValue) > max) {
+            flag = 'more';
+        }
+        switch (flag) {
+            case 'neg':
+                document.getElementById(id + 'Neg').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+            case 'more':
+                document.getElementById(id + 'More').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+            case 'notNum':
+                document.getElementById(id + 'NotNum').style.display = 'block';
+                document.getElementById(linkId).style.display = 'none';
+                break;
+        }
+        var links = document.links;
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].id == linkId) {
+                $(document.links[i]).attr("href", href);
+            }
+        }
+    });
+    $(document).on('click', '.link', function (event) {
+        var quantityId = this.id;
+        var id = quantityId.slice(0, -1);
+        var cartId = id + 'Cart';
+        document.getElementById(id).value = null;
+        success: $(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Cart/Sum",
+                dataType: 'html',
+                success: function (result) {
+                    $("#sum").html(result);
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/Cart/GetTotal",
+                dataType: 'html',
+                success: function (result) {
+                    $("#getTotal").html(result);
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/Cart/ViewCartItem",
+                data: "cartId=" + id,
+                success: function (result) {
+                    $("#" + cartId).html(result);
+                }
+            });
+        });
+    });
+</script>

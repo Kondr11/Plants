@@ -1,0 +1,17 @@
+﻿@using (Html.BeginForm("Import", "ManagingProducts", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+{
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+    <div>
+        Загрузите Excel-файл:
+        <input type="file" name="fileExcel" id="fileExcel" />
+        <div>
+            <input type="submit" value="Загрузить" />
+        </div>
+    </div>
+}
+

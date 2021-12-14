@@ -1,0 +1,65 @@
+﻿@model Plants.Models.ApplicationDbContext
+
+@{
+    ViewBag.Title = "Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Roles</h2>
+
+<p>
+    @Html.ActionLink("Добавить нового пользователя", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Логин пользователя")
+        </th>
+        <th>
+            @Html.DisplayName("Почта")
+        </th>
+        <th>
+            @Html.DisplayName("Телефонный номер")
+        </th>
+        <th>
+            @Html.DisplayName("Роль")
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var user in Model.Users)
+    {
+        <tr>
+            <td>
+                <p>@user.UserName</p>
+            </td>
+            <td>
+                <p>@user.Email</p>
+            </td>
+            <td>
+                <p>@user.PhoneNumber</p>
+            </td>
+            @{  string roleId = Model.UserRoles.Where(r => r.UserId == user.Id).First().RoleId;
+            }
+            <td>
+                @Html.DisplayName(Model.Roles.Where(x => x.Id == roleId).First().Name)
+            </td>
+            <td>
+                @{if (Model.UserRoles.Where(u => u.UserId == user.Id).First().RoleId != "6c0bd9a8-1280-4a53-8530-f877871e5571")
+                    {
+                        @Html.ActionLink("Изменить роль пользователя", "RolesEdit", new { userId = user.Id, roleId = roleId });
+                    } 
+                } |
+                @Html.ActionLink("Описание роли", "RolesDetails", new { id = roleId }) |
+                @{if (Model.UserRoles.Where(u => u.UserId == user.Id).First().RoleId != "6c0bd9a8-1280-4a53-8530-f877871e5571")
+                    {
+                        @Html.ActionLink("Удалить пользователя", "Delete", new { id = user.Id });
+                    }
+                }
+            </td>
+        </tr>
+    }
+
+</table>
+<div>
+    @Html.ActionLink("Обратно к списку пользователей", "Index")
+</div>

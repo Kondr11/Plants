@@ -1,0 +1,87 @@
+﻿@model Microsoft.AspNet.Identity.EntityFramework.IdentityUserRole
+@{
+    ViewBag.Title = "RolesEdit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>RolesEdit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+<div class="form-horizontal">
+    <h4>Roles</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Логин пользователя")
+        </dt>
+        <dd>
+            @ViewBag.UserName
+        </dd>
+        <dt>
+            @Html.DisplayName("Почта")
+        </dt>
+        <dd>
+            @ViewBag.Email
+        </dd>
+        <dt>
+            @Html.DisplayName("Телефонный номер")
+        </dt>
+        <dd>
+            @ViewBag.PhoneNumber
+        </dd>
+    </dl>
+    <div class="form-group">
+        @Html.LabelFor(model => model.RoleId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.RoleId, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.RoleId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Таблицв ролей")
+        </dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayName("Id")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Роль")
+                    </th>
+                </tr>
+                @{ var db = new Plants.Models.ApplicationDbContext();}
+                @foreach (var r in db.Roles)
+                {
+                    <tr>
+                        <th>
+                            <p>@r.Id</p>
+                        </th>
+                        <th>
+                            @r.Name
+                        </th>
+                    </tr>
+                }
+            </table>
+        </dd>
+    </dl>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Обратно к списку ролей", "Roles")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
